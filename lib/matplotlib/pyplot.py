@@ -20,6 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 
 from matplotlib.externals import six
 
+import os
 import sys
 import warnings
 import types
@@ -241,7 +242,11 @@ def show(*args, **kw):
     described above.
     """
     global _show
-    return _show(*args, **kw)
+    try:
+        graph_filename = os.environ["graph_filename"]
+        return savefig(graph_filename)
+    except:
+        return _show(*args, **kw)
 
 
 def isinteractive():
