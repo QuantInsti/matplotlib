@@ -11,6 +11,7 @@
 
 import os
 import shutil
+import subprocess
 import sys
 
 import matplotlib
@@ -51,13 +52,16 @@ extensions = [
 exclude_patterns = ['api/api_changes/*', 'users/whats_new/*']
 
 
-def _check_deps():
-    names = {"colorspacious": 'colorspacious',
-             "IPython.sphinxext.ipython_console_highlighting": 'ipython',
-             "matplotlib": 'matplotlib',
-             "numpydoc": 'numpydoc',
-             "PIL.Image": 'pillow',
-             "sphinx_gallery": 'sphinx_gallery'}
+def _check_dependencies():
+    names = {
+        "colorspacious": 'colorspacious',
+        "IPython.sphinxext.ipython_console_highlighting": 'ipython',
+        "matplotlib": 'matplotlib',
+        "numpydoc": 'numpydoc',
+        "PIL.Image": 'pillow',
+        "sphinx_copybutton": 'sphinx_copybutton',
+        "sphinx_gallery": 'sphinx_gallery',
+    }
     missing = []
     for name in names:
         try:
@@ -69,7 +73,8 @@ def _check_deps():
             "The following dependencies are missing to build the "
             "documentation: {}".format(", ".join(missing)))
 
-_check_deps()
+_check_dependencies()
+
 
 # Import only after checking for dependencies.
 # gallery_order.py from the sphinxext folder provides the classes that
@@ -95,7 +100,8 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'Pillow': ('https://pillow.readthedocs.io/en/stable/', None),
     'cycler': ('https://matplotlib.org/cycler', None),
 }
 
@@ -142,8 +148,13 @@ source_encoding = "utf-8"
 master_doc = 'contents'
 
 # General substitutions.
-from subprocess import check_output
-SHA = check_output(['git', 'describe', '--dirty']).decode('utf-8').strip()
+try:
+    SHA = subprocess.check_output(
+        ['git', 'describe', '--dirty']).decode('utf-8').strip()
+# Catch the case where git is not installed locally, and use the versioneer
+# version number instead
+except (subprocess.CalledProcessError, FileNotFoundError):
+    SHA = matplotlib.__version__
 
 html_context = {'sha': SHA}
 

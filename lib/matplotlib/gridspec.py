@@ -63,7 +63,7 @@ class GridSpecBase(object):
 
     def new_subplotspec(self, loc, rowspan=1, colspan=1):
         """
-        create and return a SuplotSpec instance.
+        create and return a SubplotSpec instance.
         """
         loc1, loc2 = loc
         subplotspec = self[loc1:loc1+rowspan, loc2:loc2+colspan]
@@ -142,7 +142,7 @@ class GridSpecBase(object):
         return fig_bottoms, fig_tops, fig_lefts, fig_rights
 
     def __getitem__(self, key):
-        """Create and return a SuplotSpec instance.
+        """Create and return a SubplotSpec instance.
         """
         nrows, ncols = self.get_geometry()
 
@@ -255,16 +255,15 @@ class GridSpec(GridSpecBase):
 
     def update(self, **kwargs):
         """
-        Update the current values.  If any kwarg is None, default to
-        the current value, if set, otherwise to rc.
-        """
+        Update the current values.
 
+        Values set to None use the rcParams value.
+        """
         for k, v in kwargs.items():
             if k in self._AllowedKeys:
                 setattr(self, k, v)
             else:
-                raise AttributeError("%s is unknown keyword" % (k,))
-
+                raise AttributeError(f"{k} is an unknown keyword")
         for figmanager in _pylab_helpers.Gcf.figs.values():
             for ax in figmanager.canvas.figure.axes:
                 # copied from Figure.subplots_adjust

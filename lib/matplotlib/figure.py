@@ -584,7 +584,7 @@ class Figure(Artist):
         wspace = self._constrained_layout_pads['wspace']
         hspace = self._constrained_layout_pads['hspace']
 
-        if relative and ((w_pad is not None) or (h_pad is not None)):
+        if relative and (w_pad is not None or h_pad is not None):
             renderer0 = layoutbox.get_renderer(self)
             dpi = renderer0.dpi
             w_pad = w_pad * dpi / renderer0.width
@@ -1290,7 +1290,7 @@ default: 'top'
         *kwargs*) then it will simply make that subplot current and
         return it.  This behavior is deprecated. Meanwhile, if you do
         not want this behavior (i.e., you want to force the creation of a
-        new suplot), you must use a unique set of args and kwargs.  The axes
+        new subplot), you must use a unique set of args and kwargs.  The axes
         *label* attribute has been exposed for this purpose: if you want
         two subplots that are otherwise identical to be added to the figure,
         make sure you give them unique labels.
@@ -1311,14 +1311,14 @@ default: 'top'
         --------
         ::
 
-            fig=plt.figure()
+            fig = plt.figure()
             fig.add_subplot(221)
 
             # equivalent but more general
-            ax1=fig.add_subplot(2, 2, 1)
+            ax1 = fig.add_subplot(2, 2, 1)
 
             # add a subplot with no frame
-            ax2=fig.add_subplot(222, frameon=False)
+            ax2 = fig.add_subplot(222, frameon=False)
 
             # add a polar subplot
             fig.add_subplot(223, projection='polar')
@@ -1333,7 +1333,7 @@ default: 'top'
             fig.add_subplot(ax2)
         """
         if not len(args):
-            return
+            args = (1, 1, 1)
 
         if len(args) == 1 and isinstance(args[0], Integral):
             if not 100 <= args[0] <= 999:
@@ -1951,9 +1951,9 @@ default: 'top'
         restore_to_pylab = state.pop('_restore_to_pylab', False)
 
         if version != _mpl_version:
-            cbook._warn_external("This figure was saved with matplotlib "
-                                 "version %s and is unlikely to function "
-                                 "correctly." % (version,))
+            cbook._warn_external(
+                f"This figure was saved with matplotlib version {version} and "
+                f"is unlikely to function correctly.")
 
         self.__dict__ = state
 
@@ -2103,7 +2103,12 @@ default: 'top'
               `~.backend_pdf.PdfPages`.
             - 'eps' and 'ps' with PS backend: Only 'Creator' is supported.
 
+        pil_kwargs : dict, optional
+            Additional keyword arguments that are passed to `PIL.Image.save`
+            when saving the figure.  Only applicable for formats that are saved
+            using Pillow, i.e. JPEG and TIFF.
         """
+
         kwargs.setdefault('dpi', rcParams['savefig.dpi'])
         if frameon is None:
             frameon = rcParams['savefig.frameon']

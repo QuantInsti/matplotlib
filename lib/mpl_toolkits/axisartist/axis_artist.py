@@ -714,7 +714,7 @@ class TickLabels(AxisLabel, AttributeCopier):  # mtext.Text
         for (x, y), a, l in self._locs_angles_labels:
             if not l.strip():
                 continue
-            clean_line, ismath = self.is_math_text(l)
+            clean_line, ismath = self._preprocess_math(l)
             whd = renderer.get_text_width_height_descent(
                 clean_line, self._fontproperties, ismath=ismath)
             whd_list.append(whd)
@@ -1034,12 +1034,9 @@ class AxisArtist(martist.Artist):
 
         for loc, angle_normal, angle_tangent, label in tick_iter:
             angle_label = angle_tangent - 90 + ticklabel_add_angle
-
-            if np.cos((angle_label - angle_normal)/180.*np.pi) < 0.:
-                angle_tick = angle_normal
-            else:
-                angle_tick = angle_normal + 180
-
+            angle_tick = (angle_normal
+                          if 90 <= (angle_label - angle_normal) % 360 <= 270
+                          else angle_normal + 180)
             ticks_loc_angle.append([loc, angle_tick])
             ticklabels_loc_angle_label.append([loc, angle_label, label])
 

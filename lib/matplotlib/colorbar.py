@@ -141,11 +141,16 @@ but the first are also method signatures for the
 Parameters
 ----------
 mappable
-    The `~matplotlib.cm.ScalarMappable` (i.e., `~matplotlib.image.Image`,
-    `~matplotlib.contour.ContourSet`, etc.) to which the colorbar applies.
+    The `matplotlib.cm.ScalarMappable` (i.e., `~matplotlib.image.Image`,
+    `~matplotlib.contour.ContourSet`, etc.) described by this colorbar.
     This argument is mandatory for the `.Figure.colorbar` method but optional
     for the `.pyplot.colorbar` function, which sets the default to the current
     image.
+
+    Note that one can create a `ScalarMappable` "on-the-fly" to generate
+    colorbars not attached to a previously drawn artist, e.g. ::
+
+        fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap, ax=ax))
 
 cax : :class:`~matplotlib.axes.Axes` object, optional
     Axes into which the colorbar will be drawn.
@@ -569,7 +574,7 @@ class ColorbarBase(cm.ScalarMappable):
         self.stale = True
 
     def get_ticks(self, minor=False):
-        """Return the x ticks as a list of locations"""
+        """Return the x ticks as a list of locations."""
         if self._manual_tick_data_values is None:
             ax = self.ax
             if self.orientation == 'vertical':
@@ -584,9 +589,10 @@ class ColorbarBase(cm.ScalarMappable):
 
     def set_ticklabels(self, ticklabels, update_ticks=True):
         """
-        set tick labels. Tick labels are updated immediately unless
-        update_ticks is *False*. To manually update the ticks, call
-        *update_ticks* method explicitly.
+        Set tick labels.
+
+        Tick labels are updated immediately unless *update_ticks* is *False*,
+        in which case one should call `.update_ticks` explicitly.
         """
         if isinstance(self.locator, ticker.FixedLocator):
             self.formatter = ticker.FixedFormatter(ticklabels)
@@ -638,10 +644,8 @@ class ColorbarBase(cm.ScalarMappable):
         self.stale = True
 
     def set_label(self, label, **kw):
-        '''
-        Label the long axis of the colorbar
-        '''
-        self._label = '%s' % (label, )
+        """Label the long axis of the colorbar."""
+        self._label = str(label)
         self._labelkw = kw
         self._set_label()
 
@@ -864,7 +868,7 @@ class ColorbarBase(cm.ScalarMappable):
         self.vmax = b[-1]
 
     def _central_N(self):
-        '''number of boundaries **before** extension of ends'''
+        """Return the number of boundaries excluding end extensions."""
         nb = len(self._boundaries)
         if self.extend == 'both':
             nb -= 2
@@ -1128,11 +1132,13 @@ class Colorbar(ColorbarBase):
                                erase=erase)
 
     def update_normal(self, mappable):
-        '''
-        update solid, lines, etc. Unlike update_bruteforce, it does
-        not clear the axes.  This is meant to be called when the image
-        or contour plot to which this colorbar belongs is changed.
-        '''
+        """
+        Update solid patches, lines, etc.
+
+        Unlike `.update_bruteforce`, this does not clear the axes.  This is
+        meant to be called when the image or contour plot to which this
+        colorbar belongs changes.
+        """
         self.draw_all()
         if isinstance(self.mappable, contour.ContourSet):
             CS = self.mappable

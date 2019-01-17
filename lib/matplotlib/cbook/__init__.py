@@ -864,7 +864,7 @@ def print_cycles(objects, outstream=sys.stdout, show_progress=False):
                 recurse(referent, start, all, current_path + [obj])
 
     for obj in objects:
-        outstream.write("Examining: %r\n" % (obj,))
+        outstream.write(f"Examining: {obj!r}\n")
         recurse(obj, obj, {}, [])
 
 
@@ -2118,3 +2118,13 @@ def _check_and_log_subprocess(command, logger, **kwargs):
             .format(command, exc.output.decode('utf-8')))
     logger.debug(report)
     return report
+
+
+def _check_not_matrix(**kwargs):
+    """
+    If any value in *kwargs* is a `np.matrix`, raise a TypeError with the key
+    name in its message.
+    """
+    for k, v in kwargs.items():
+        if isinstance(v, np.matrix):
+            raise TypeError(f"Argument {k!r} cannot be a np.matrix")
