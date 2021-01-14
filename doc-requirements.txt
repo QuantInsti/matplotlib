@@ -6,7 +6,6 @@
 # Install the documentation requirements with:
 #     pip install -r doc-requirements.txt
 #
-numpy==1.16.4
 sphinx>=1.3,!=1.5.0,!=1.6.4,!=1.7.3
 colorspacious
 ipython
