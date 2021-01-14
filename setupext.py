@@ -986,10 +986,10 @@ class Numpy(SetupPackage):
         ext.define_macros.append(('__STDC_FORMAT_MACROS', 1))
 
     def get_setup_requires(self):
-        return ['numpy>=1.7.1']
+        return ['numpy==1.16.4']
 
     def get_install_requires(self):
-        return ['numpy>=1.7.1']
+        return ['numpy==1.16.4']
 
 
 class LibAgg(SetupPackage):
